@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gxa.mapper.StudnetMapper">
+
+
+    <insert id="save">
+        insert into student (stu_name,
+        stu_age, stu_gender,stu_phone,
+        stu_hobby, stu_course_intention,
+        parent_name, parent_phone,
+        activity_id, consultant_id,
+        create_time) values
+        <foreach collection="list" separator="," item="student">
+            (#{student.stuName},
+            #{student.stuAge},
+            #{student.stuGender},
+            #{student.stuPhone},
+            #{student.stuHobby},
+            #{student.stuCourseIntention},
+            #{student.parentName},#{student.parentPhone},
+            #{student.activityId},#{student.consultantId},
+            #{student.createTime})
+        </foreach>
+
+
+    </insert>
+    <select id="getAllStudent" resultType="com.gxa.pojo.Student">
+        select * from student
+        <where>
+            is_deleted=0
+          <!--  <if test="studentParamVo.keyWords !=null and studentParamVo.keyWords ！=''"
+            >
+                and stu_name like concat('%',#{studentParamVo.keyWords},'%')
+            </if>
+            <if test="studentParamVo.status !=null"
+            >
+                and status =#{studentParamVo.status}
+            </if>
+            <if test="studentParamVo.startTime !=null and studentParamVo.startTime ！=''"
+            >
+                and create_time >=#{studentParamVo.startTime}
+            </if>
+            <if test="studentParamVo.endTime !=null and studentParamVo.endTime ！=''"
+            >
+                and create_time &lt;=#{studentParamVo.endTime}
+            </if>-->
+
+        </where>
+          order by id desc
+    </select>
+    <select id="download" resultType="com.gxa.pojo.Vo.StudentDownloadVo">
+        select * from student
+    </select>
+</mapper>

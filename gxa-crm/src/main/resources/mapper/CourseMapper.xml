@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gxa.mapper.CourseMapper">
+    <!--添加课程-->
+    <insert id="doAddCourse">
+        insert into course (
+        course_name,course_desc,course_price,course_count,
+        create_time) values
+        (#{course.courseName},#{course.courseDesc},
+        #{course.coursePrice},#{course.courseCount},
+        #{course.createTime});
+
+    </insert>
+    <!--删除课程-->
+    <update id="deleteCourseIds">
+        update course set is_deleted = 1 where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <update id="doUpdate">
+        update course
+        <set>
+            <if test="course.courseName != null and course.courseName !=''">
+                course_name=#{course.courseName},
+            </if>
+            <if test="course.coursePrice != null">
+                course_price=#{course.coursePrice},
+            </if>
+            <if test="course.courseCount != null">
+                course_count=#{course.courseCount},
+            </if>
+            <if test="course.courseDesc != null and course.courseDesc !=''">
+                course_desc=#{course.courseDesc},
+            </if>
+            <if test="course.updateTime != null">
+                update_time=#{course.updateTime},
+            </if>
+        </set>
+        where id=#{course.id}
+    </update>
+
+    <!--查询所有课程-->
+    <select id="getAllCourse" resultType="com.gxa.pojo.Course">
+        select * from course
+         <where>
+             is_deleted = 0
+            <if test="courseVo.keyWords != null and courseVo.keyWords != ''">
+                 and course_name like concat('%',#{courseVo.keyWords},'%')
+            </if>
+            <if test="courseVo.startTime != null and courseVo.startTime != ''">
+                 and create_time >= #{courseVo.startTime}
+            </if>
+            <if test="courseVo.endTime != null and courseVo.endTime != ''">
+                 and create_time &lt;= #{courseVo.endTime}
+            </if>
+
+         </where>
+         order by id desc
+    </select>
+    <!--通过课程名称-->
+    <select id="getCourseByName" resultType="com.gxa.pojo.Course">
+        select * from course where course_name = #{courseName}
+    </select>
+    <select id="findCourseByid" resultType="com.gxa.pojo.Course">
+        select * from course where id=#{id} and is_deleted=0
+    </select>
+    <select id="getAllCourse2" resultType="com.gxa.pojo.Course">
+        select * from course where is_deleted=0
+    </select>
+</mapper>

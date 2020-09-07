@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gxa.mapper.MarketPlanMapper">
+
+    <resultMap id="planMap" type="com.gxa.pojo.MarketPlan">
+        <id property="id" column="id"></id>
+        <result property="planName" column="plan_name"></result>
+        <result property="planDetail" column="plan_detail"></result>
+        <result property="planStuCount" column="plan_stu_count"></result>
+        <result property="planName" column="plan_name"></result>
+        <result property="status" column="status"></result>
+        <result property="courseId" column="course_id"></result>
+        <result property="teacherId" column="teacher_id"></result>
+        <result property="classRoomId" column="class_room_id"></result>
+        <result property="isDeleted" column="is_deleted"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updateTime" column="update_time"></result>
+        <!--关联课程-->
+        <association property="course" column="course_id" javaType="com.gxa.pojo.Course"
+                     select="com.gxa.mapper.CourseMapper.findCourseByid"/>
+       <!--关联老师-->
+        <association property="teacher" column="teacher_id" javaType="com.gxa.pojo.Teacher"
+                     select="com.gxa.mapper.TeacherMapper.findById"/>
+        <!--关联教室-->
+        <association property="classRoom" column="class_room_id" javaType="com.gxa.pojo.ClassRoom"
+                     select="com.gxa.mapper.ClassRoomMapper.findById"/>
+
+    </resultMap>
+    <delete id="doDelete">
+        delete from market_plan where id in
+        <foreach collection="planIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+
+    </delete>
+
+
+    <!--查询所有计划-->
+    <select id="findAll" resultMap="planMap">
+    select * from market_plan
+      <where>
+      is_deleted = 0
+      <if test="marketPlanVo.planEndTime != null and marketPlanVo.planEndTime !=''">
+          and plan_end_time = #{marketPlanVo.planEndTime}
+      </if>
+      <if test="marketPlanVo.keyWords != null and marketPlanVo.keyWords !=''">
+          and plan_name like concat('%',#{marketPlanVo.keyWords},'%')
+      </if>
+      <if test="marketPlanVo.courseId != null">
+          and course_id = #{marketPlanVo.courseId}
+      </if>
+      <if test="marketPlanVo.status != null">
+          and status = #{marketPlanVo.status}
+      </if>
+
+      </where>
+    order by id desc
+    </select>
+
+    <!--添加市场计划-->
+    <insert id="save">
+        insert into market_plan (
+        plan_name, plan_detail, course_id, teacher_id,
+         class_room_id, plan_stu_count, plan_end_time, create_time) values (
+        #{marketPlan.planName},
+        #{marketPlan.planDetail},
+        #{marketPlan.courseId},
+        #{marketPlan.teacherId},
+        #{marketPlan.classRoomId},
+        #{marketPlan.planStuCount},
+        #{marketPlan.planEndTime},
+        #{marketPlan.createTime});
+    </insert>
+
+</mapper>
